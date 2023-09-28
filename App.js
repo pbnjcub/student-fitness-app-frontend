@@ -1,14 +1,11 @@
-// import 'react-native-gesture-handler';
+import React from 'react';
+
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
-// import React from 'react';
+
 import Home from './components/Home';
-import StudentsDashboard from './components/StudentsDashboard';
+import AdminDashboard from './components/AdminDashboard';
 
-// import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
-
-// const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
 export default function App() {
@@ -16,7 +13,7 @@ export default function App() {
     <NavigationContainer>
       <Drawer.Navigator initialRouteName="Home">
         <Drawer.Screen name="Home" component={Home} options={{ title: 'Home' }} />
-        <Drawer.Screen name="StudentsDashboard" component={StudentsDashboard} options={{ title: 'Student Dashboard' }} />
+        <Drawer.Screen name="AdminDashboard" component={AdminDashboard} options={{ title: 'Admin Dashboard' }} />
       </Drawer.Navigator>
     </NavigationContainer>
   );
