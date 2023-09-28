@@ -31,33 +31,31 @@ const API_URL = 'http://localhost:3000/api/upload'; // Replace with your actual 
  * @param {Object} file - File object representing the .csv file, usually obtained from a document picker
  * @returns {Promise} - A promise that resolves with the server response or rejects with an error
  */
-export const uploadCSV = async (file) => {
+//...rest of the code
+
+export const uploadCSV = async ({ uri, name, type, blob }) => {
   try {
-    const { uri, name, type } = file; // Destructuring properties from file object
-    
+
     const formData = new FormData();
-    formData.append('file', { uri, name, type, filename: name }); // some server implementations might need filename
-    
-    // Making a POST request to the server with the file included in the request body
-    const response = await fetch(API_URL, {
+    formData.append('file', blob, name); // Appending Blob file
+
+
+    const response = await fetch('http://localhost:3000/api/upload', {
       method: 'POST',
       mode: 'cors',
       credentials: 'include',
       body: formData,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
     });
-    
+
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(`Upload failed with status ${response.status}: ${errorData.message}`);
     }
-    
-    // If successful, return the server response
-    return await response.json();
+
+    const responseData = await response.json();
+    return responseData;
   } catch (error) {
-    console.error('Upload error:', error.message || error);
     throw error;
   }
 };
