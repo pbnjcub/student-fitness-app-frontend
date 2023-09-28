@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from 'react';
+
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
-import { getAllStudents } from '../actions/students'; // Adjust the import path accordingly.
+
+import { getAllStudents } from '../actions/admin'; // Adjust the import path accordingly.
+
+import BulkStudentUploadBtn from './BulkStudentUploadBtn';
 
 const AdminDashboard = () => {
   const [students, setStudents] = useState([]);
@@ -25,9 +29,21 @@ const AdminDashboard = () => {
       });
   }, []);
 
+  const handleUploadSuccess = (data) => {
+    Alert.alert('Success', 'File uploaded and processed successfully.');
+  };
+
+  const handleUploadError = (error) => {
+    Alert.alert('Error', 'File upload failed. Please try again.');
+  };
+
   const renderItem = ({ item }) => (
     <View style={styles.item}>
-      <Text>{item.name} - {item.gradeYear}</Text> {/* Adjust according to the actual structure of your data */}
+      <Text>Name: {item.name}</Text>
+      <Text>Birth Date: {new Date(item.birthDate).toLocaleDateString()}</Text>
+      <Text>Graduation Year: {item.gradYear}</Text>
+      <Text>Weight: {item.weight} kg</Text>
+      <Text>Height: {item.height} cm</Text>
     </View>
   );
 
@@ -43,6 +59,8 @@ const AdminDashboard = () => {
           keyExtractor={item => item.id.toString()} // Adjust according to the actual structure of your data
         />
       )}
+      <BulkStudentUploadBtn onUploadSuccess={handleUploadSuccess} onUploadError={handleUploadError} />
+
     </View>
   );
 }
