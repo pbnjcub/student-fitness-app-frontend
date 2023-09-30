@@ -59,3 +59,29 @@ export const uploadCSV = async ({ uri, name, type, blob }) => {
     throw error;
   }
 };
+
+export const uploadStudent = async (studentData) => {
+  try {
+    const response = await fetch('http://localhost:3000/api/students', { // Adjust the URL to your API endpoint for creating a student
+      method: 'POST',
+      mode: 'cors',
+      credentials: 'include', // If you don't use cookies, you might not need this line
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify(studentData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Upload failed with status ${response.status}: ${errorData.message}`);
+    }
+
+    const responseData = await response.json();
+    return responseData;
+  } catch (error) {
+    throw error;
+  }
+};
+

@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import {
+  StatusBar,
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  Dimensions,
+} from 'react-native';
 
-import { StatusBar } from 'expo-status-bar';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
-
-import { getAllStudents } from '../actions/admin'; // Adjust the import path accordingly.
 import { showAlert } from '../utilities/alertUtil';
 
-import BulkStudentUploadBtn from './BulkStudentUploadBtn';
+import { getAllStudents } from '../actions/admin';
+import BulkStudentUploadBtn from './AdminBulkStudentUploadBtn';
+import StudentManagementLinks from './AdminStudentManagementLinks'; // Import the component
 
 const AdminDashboard = () => {
   const [students, setStudents] = useState([]);
@@ -34,22 +40,22 @@ const AdminDashboard = () => {
   }, []);
 
   const handleUploadSuccess = async (data) => {
-    showAlert('Success', 'File uploaded and processed successfully.'); // Using showAlert utility here
-    await loadStudents();
-};
+    if (data.newStudents && data.newStudents.length > 0) {
+      setStudents([...students, ...data.newStudents]);
+    }
+    showAlert('Success', 'File uploaded and processed successfully.');
+  };
 
-const handleUploadError = (error) => {
-    showAlert('Error', 'File upload failed. Please try again.'); // Using showAlert utility here
-};
+  const handleUploadError = (error) => {
+    showAlert('Error', 'File upload failed. Please try again.');
+  };
 
-
-  const renderItem = ({ item }) => (
-    <View style={styles.item}>
-      <Text>Name: {item.firstName} {item.lastName} </Text>
-      <Text>Birth Date: {new Date(item.birthDate).toLocaleDateString()}</Text>
-      <Text>Graduation Year: {item.gradYear}</Text>
-    </View>
-  );
+  const actions = [
+    'Search By:',
+    'Student Management:',
+    'Course Management:',
+    'Teacher Management:',
+  ];
 
   return (
     <View style={styles.container}>
@@ -57,23 +63,46 @@ const handleUploadError = (error) => {
       {isLoading && <Text>Loading...</Text>}
       {errors && <Text>Error: {errors}</Text>}
       {!isLoading && !errors && (
-        <FlatList
-          data={students}
-          renderItem={renderItem}
-          keyExtractor={item => item.id.toString()} // Adjust according to the actual structure of your data
-        />
+        <View style={styles.actionsContainer}>
+          {actions.map((action, index) => (
+            <View key={index} style={styles.actionContainer}>
+              <Text style={styles.actionText}>{action}</Text>
+              {action === 'Student Management:' && <StudentManagementLinks />}
+            </View>
+          ))}
+        </View>
       )}
-      <BulkStudentUploadBtn onUploadSuccess={handleUploadSuccess} onUploadError={handleUploadError} />
-
     </View>
   );
 }
 
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
+
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
+    flex: 1, 
+    alignItems: 'center', // Aligning children horizontally at the center, can remove if not needed
+    paddingTop: 20, // Optional: adding some padding at the top of the container
+    backgroundColor: 'white', // Since you want the background to be white
+  },
+  actionsContainer: {
+    width: windowWidth * 0.5, // 80% of window width
+    // Removed height to allow the container to grow with its content.
+    alignSelf: 'center', // Center the actions container horizontally
+    backgroundColor: 'white', // Ensuring that the background color is white
+  },
+  actionContainer: {
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
     alignItems: 'center',
+    backgroundColor: '#FFFFFF', // Keeping this white as per your previous message
+    margin: 5, // Optional: adding some margin between the action containers
+  },
+  actionText: {
+    fontSize: 16,
   },
   item: {
     padding: 10,
@@ -81,5 +110,6 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
   },
 });
+
 
 export default AdminDashboard;
