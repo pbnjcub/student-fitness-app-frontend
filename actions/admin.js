@@ -62,6 +62,7 @@ export const uploadCSV = async ({ uri, name, type, blob }) => {
 
 export const uploadStudent = async (studentData) => {
   try {
+    console.log(studentData)
     const response = await fetch('http://localhost:3000/api/students', { // Adjust the URL to your API endpoint for creating a student
       method: 'POST',
       mode: 'cors',
