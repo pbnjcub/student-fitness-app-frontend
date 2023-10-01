@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
   linksContainer: {
     paddingTop: 10,
     alignItems: 'center', // to align buttons in the center
-    backgroundColor: 'white', 
+    backgroundColor: '#F0F0F0', 
   },
   button: {
     backgroundColor: '#007BFF', // Bootstrap primary button color, you can change as needed

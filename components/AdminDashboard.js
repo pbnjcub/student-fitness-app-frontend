@@ -36,12 +36,12 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingTop: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
   },
   actionsContainer: {
     width: windowWidth * 0.5,
     alignSelf: 'center',
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
   },
   actionContainer: {
     padding: 10,
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 5,
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F0F0F0',
     margin: 5,
   },
   actionText: {

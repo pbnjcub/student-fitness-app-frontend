@@ -33,13 +33,11 @@ const AddStudents = ({ onUploadSuccess, onUploadError }) => {
         
         setNewStudent(updatedStudent);
     };
-    console.log(newStudent)
     
     const handleAddStudent = async () => {
         try {
             const serverResponse = await uploadStudent(newStudent);
-
-            addStudent(serverResponse.newStudent)
+            addStudent(serverResponse)
             showAlert('Success', 'Student is successfully added.');
             navigation.goBack(); // Navigate back after successful upload
         } catch (err) {
