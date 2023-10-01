@@ -1,29 +1,29 @@
 export const getAllStudents = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/api/students', {
-        method: 'GET',
-        mode: 'cors',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        credentials: 'include',
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw errorData;
-      }
-      
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      return { errors: error.messages || 'An error occurred' };
+  try {
+    const response = await fetch('http://localhost:3000/api/students', {
+      method: 'GET',
+      mode: 'cors',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw errorData;
     }
-  };
-  
-  // Define the API URL where you want to send the .csv file
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    return { errors: error.messages || 'An error occurred' };
+  }
+};
+
+// Define the API URL where you want to send the .csv file
 const API_URL = 'http://localhost:3000/api/upload'; // Replace with your actual API endpoint
 
 /**
@@ -86,3 +86,27 @@ export const uploadStudent = async (studentData) => {
   }
 };
 
+export const editStudent = async (studentId, studentData) => {
+  try {
+    const response = await fetch(`http://localhost:3000/api/students/${studentId}`, {
+      method: 'PATCH', // or 'PUT' if your API uses PUT for updates
+      mode: 'cors',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify(studentData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Edit failed with status ${response.status}: ${errorData.message}`);
+    }
+
+    const responseData = await response.json();
+    return responseData;
+  } catch (error) {
+    throw error;
+  }
+};
