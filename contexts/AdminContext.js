@@ -36,8 +36,16 @@ export const AdminProvider = ({ children }) => {
     setStudents(prevStudents => [...prevStudents, ...newStudents]);
   };
 
+  const addEditedStudent = (editedStudent) => {
+    setStudents(prevStudents => 
+      prevStudents.map(student => 
+        student.id === editedStudent.id ? editedStudent : student
+      )
+    );
+  }
+
   return (
-    <AdminContext.Provider value={{ students, setStudents, addStudent, addMultipleStudents, errors, isLoading }}>
+    <AdminContext.Provider value={{ students, setStudents, addStudent, addMultipleStudents, addEditedStudent, errors, isLoading }}>
       {children}
     </AdminContext.Provider>
   );

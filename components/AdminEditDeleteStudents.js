@@ -1,40 +1,72 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, TextInput, Button, TouchableOpacity, Picker } from 'react-native';
 
 import { useAdminContext } from '../contexts/AdminContext';
 import { editStudent } from '../actions/admin';
 import { showAlert } from '../utilities/alertUtil';
+
+import FilteredUsersList from './FilteredUsersList';
+import SearchInput from './SearchInput';
+
 import GlobalStyles from '../styles/globalStyles';
 
 const AdminEditDeleteStudents = () => {
-    console.log("you've reached the AdminEditDeleteStudents.js file")
-    const { students } = useAdminContext();
+    const { students, addEditedStudent } = useAdminContext();
 
     const [searchStudent, setSearchStudent] = useState('');
     const [filteredStudents, setFilteredStudents] = useState([]);
-    const [updatedStudent, setUpdatedStudent] = useState({
+    const [searchBy, setSearchBy] = useState('name');
+    const searchOptions = [
+        { label: 'Name', value: 'name' },
+        { label: 'Email', value: 'email' },
+        { label: 'Graduation Year', value: 'gradYear' },
+    ]
+
+    const initialUpdatedStudentState = {
         email: '',
         password: '',
         firstName: '',
         lastName: '',
         birthDate: '',
         gradYear: '',
-    });
+    };
+
+    const [updatedStudent, setUpdatedStudent] = useState(initialUpdatedStudentState);
     const [showEditForm, setShowEditForm] = useState(false);
     const [errorMessages, setErrorMessages] = useState([]);
 
     const handleSearch = (query) => {
         setSearchStudent(query);
-        const filtered = students.filter((student) =>
-            student.firstName.toLowerCase().includes(query.toLowerCase()) ||
-            student.lastName.toLowerCase().includes(query.toLowerCase())
-        );
+        let filtered = [];
+        switch (searchBy) {
+            case 'name':
+                filtered = students.filter(student => 
+                    student.firstName.toLowerCase().includes(query.toLowerCase()) || 
+                    student.lastName.toLowerCase().includes(query.toLowerCase())
+                );
+                break;
+            case 'gradYear':
+                filtered = students.filter(student => 
+                    student.gradYear.toString() === query
+                );
+                break;
+            case 'email':
+                filtered = students.filter(student => 
+                    student.email.toLowerCase().includes(query.toLowerCase())
+                );
+                break;
+            default:
+                break;
+        }
         setFilteredStudents(filtered);
     };
+    
 
     const handleEditClick = (student) => {
         setUpdatedStudent(student);
         setShowEditForm(true);
+        setFilteredStudents([]);
+        setSearchStudent('');
     };
 
     const handleChange = (field, value) => {
@@ -45,8 +77,10 @@ const AdminEditDeleteStudents = () => {
         try {
             const serverResponse = await editStudent(updatedStudent.id, updatedStudent);
             if (serverResponse) {
+                addEditedStudent(serverResponse);
                 showAlert('Success', 'Student is successfully edited.');
                 setShowEditForm(false);
+                setUpdatedStudent(initialUpdatedStudentState);
             }
         } catch (err) {
             console.error('Student edit error: ', err);
@@ -65,24 +99,7 @@ const AdminEditDeleteStudents = () => {
             gradYear: '',
         });
     };
-
-    const TableHeader = () => (
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
-            <Text style={{ width: '80%', textAlign: 'left', ...GlobalStyles.tableHeaderText }}>Name</Text>
-            <Text style={{ width: '20%', textAlign: 'left', ...GlobalStyles.tableHeaderText }}>Actions</Text>
-        </View>
-    );
-    
-    const renderStudentItem = ({ item: student }) => (
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 }}>
-            <Text style={{ width: '80%', textAlign: 'left' }}>{`${student.firstName} ${student.lastName}`}</Text>
-            <TouchableOpacity style={{ width: '20%', textAlign: 'right' }} onPress={() => handleEditClick(student)}>
-                <Text>Edit</Text>
-            </TouchableOpacity>
-        </View>
-    );
-    
-
+  
     const renderErrors = () => 
         errorMessages.map((message, index) => (
             <View key={index}>
@@ -92,78 +109,71 @@ const AdminEditDeleteStudents = () => {
 
         return (
             <View style={GlobalStyles.container}>
-                <Text style={GlobalStyles.headerText}>Student Edit Form</Text>
-                {renderErrors()}
-                <View style={{ width: '80%' }}> {/* Adjust the width according to your design */}
-                    <Text style={GlobalStyles.subHeaderText}>Search by Name:</Text>
-                    <TextInput
-                        value={searchStudent}
-                        onChangeText={handleSearch}
-                        style={GlobalStyles.input}
-                    />
-                </View>
-                <Text style={GlobalStyles.subHeaderText}>Search Results:</Text>
-                <TableHeader />
-                <FlatList
-                    data={filteredStudents}
-                    renderItem={renderStudentItem}
-                    keyExtractor={(item) => item.id.toString()}
-                    style={{ width: '80%' }} // Adjust the width according to your design
+              <Text style={GlobalStyles.headerText}>Student Edit Form</Text>
+              {renderErrors()}
+              <SearchInput
+                searchBy={searchBy}
+                setSearchBy={setSearchBy}
+                searchQuery={searchStudent}
+                handleSearch={handleSearch}
+                searchOptions={searchOptions}
+              />
+              {filteredStudents.length > 0 && (
+                <FilteredUsersList
+                  data={filteredStudents}
+                  onEditClick={handleEditClick}
                 />
-    
-                {showEditForm && (
-                    <View style={{ marginTop: 20, width: '80%' }}> {/* Adjust the width according to your design */}
-                        <TextInput
-                            placeholder="Email"
-                            value={updatedStudent.email}
-                            onChangeText={(text) => handleChange('email', text)}
-                            style={GlobalStyles.input}
-                        />
-                        <TextInput
-                            placeholder="Password"
-                            value={updatedStudent.password}
-                            onChangeText={(text) => handleChange('password', text)}
-                            style={GlobalStyles.input}
-                            secureTextEntry
-                        />
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Text>First Name:</Text>
-                            <TextInput
-                                placeholder="First Name"
-                                value={updatedStudent.firstName}
-                                onChangeText={(text) => handleChange('firstName', text)}
-                                style={GlobalStyles.input}
-                            />
-                        </View>
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Text>Last Name:</Text>
-                            <TextInput
-                                placeholder="Last Name"
-                                value={updatedStudent.lastName}
-                                onChangeText={(text) => handleChange('lastName', text)}
-                                style={GlobalStyles.input}
-                            />
-                        </View>
-                        <TextInput
-                            placeholder="Birthday (YYYY-MM-DD)"
-                            value={updatedStudent.birthDate}
-                            onChangeText={(text) => handleChange('birthDate', text)}
-                            style={GlobalStyles.input}
-                        />
-                        <TextInput
-                            placeholder="Graduation Year"
-                            value={updatedStudent.gradYear}
-                            onChangeText={(text) => handleChange('gradYear', text)}
-                            style={GlobalStyles.input}
-                        />
-                        <View style={GlobalStyles.buttonContainer}>
-                            <Button title="Submit Changes" onPress={handleEditSubmit} />
-                            <Button title="Cancel" onPress={handleCancel} />
-                        </View>
+              )}
+              {showEditForm && (
+                <View style={{ marginTop: 20, width: '80%' }}>
+                  {[
+                    { label: 'Email:', value: 'email', placeholder: 'Email' },
+                    {
+                      label: 'Password:',
+                      value: 'password',
+                      placeholder: 'Password',
+                      secureTextEntry: true,
+                    },
+                    {
+                      label: 'First Name:',
+                      value: 'firstName',
+                      placeholder: 'First Name',
+                    },
+                    {
+                      label: 'Last Name:',
+                      value: 'lastName',
+                      placeholder: 'Last Name',
+                    },
+                    {
+                      label: 'Birthday:',
+                      value: 'birthDate',
+                      placeholder: 'Birthday (YYYY-MM-DD)',
+                    },
+                    {
+                      label: 'Graduation Year:',
+                      value: 'gradYear',
+                      placeholder: 'Graduation Year',
+                    },
+                  ].map((field) => (
+                    <View key={field.value} style={{ marginBottom: 10 }}>
+                      <Text>{field.label}</Text>
+                      <TextInput
+                        placeholder={field.placeholder}
+                        value={updatedStudent[field.value]}
+                        onChangeText={(text) => handleChange(field.value, text)}
+                        style={GlobalStyles.input}
+                        secureTextEntry={field.secureTextEntry || false}
+                      />
                     </View>
-                )}
+                  ))}
+                  <View style={GlobalStyles.buttonContainer}>
+                    <Button title="Submit Changes" onPress={handleEditSubmit} />
+                    <Button title="Cancel" onPress={handleCancel} />
+                  </View>
+                </View>
+              )}
             </View>
-        );
-    }
-    
-    export default AdminEditDeleteStudents;
+          );
+        };
+        
+        export default AdminEditDeleteStudents;
