@@ -84,4 +84,20 @@ export default StyleSheet.create({
     borderWidth: 1, 
     backgroundColor: 'white', 
   },
+  linksContainer: {
+    paddingTop: 10,
+    alignItems: 'center',
+    backgroundColor: '#F0F0F0',
+  },
+  button: {
+    backgroundColor: '#007BFF',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 16,
+  },
 });

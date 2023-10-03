@@ -10,7 +10,7 @@ import SearchInput from './SearchInput';
 
 import GlobalStyles from '../styles/globalStyles';
 
-const AdminEditDeleteStudents = () => {
+const AdminEditStudents = () => {
     const { students, addEditedStudent } = useAdminContext();
 
     const [searchStudent, setSearchStudent] = useState('');
@@ -126,6 +126,9 @@ const AdminEditDeleteStudents = () => {
               )}
               {showEditForm && (
                 <View style={{ marginTop: 20, width: '80%' }}>
+                    <Text style={GlobalStyles.headerText}>
+                        Editing Student: {updatedStudent.firstName} {updatedStudent.lastName}
+                    </Text>
                   {[
                     { label: 'Email:', value: 'email', placeholder: 'Email' },
                     {
@@ -167,8 +170,12 @@ const AdminEditDeleteStudents = () => {
                     </View>
                   ))}
                   <View style={GlobalStyles.buttonContainer}>
-                    <Button title="Submit Changes" onPress={handleEditSubmit} />
-                    <Button title="Cancel" onPress={handleCancel} />
+                    <View style={GlobalStyles.submitBtn}>
+                        <Button title="Submit Changes" onPress={handleEditSubmit} />
+                    </View>
+                    <View>
+                        <Button title="Cancel" onPress={handleCancel} />
+                    </View>
                   </View>
                 </View>
               )}
@@ -176,4 +183,4 @@ const AdminEditDeleteStudents = () => {
           );
         };
         
-        export default AdminEditDeleteStudents;
+        export default AdminEditStudents;

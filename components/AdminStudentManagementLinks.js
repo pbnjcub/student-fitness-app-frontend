@@ -1,45 +1,27 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // import useNavigation hook
+import globalStyles from '../styles/globalStyles';
 
 const StudentManagementLinks = () => {
     const navigation = useNavigation();
   
     return (
-      <View style={styles.linksContainer}>
-        <TouchableOpacity 
-            onPress={() => navigation.navigate('AdminAddStudents')} 
-            style={styles.button}
-        >
-          <Text style={styles.buttonText}>Add Student or Bulk Upload</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-            onPress={() => alert('Delete/Edit Student')} 
-            style={styles.button}
-        >
-          <Text style={styles.buttonText}>Delete/Edit Student</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  };
-
-const styles = StyleSheet.create({
-  linksContainer: {
-    paddingTop: 10,
-    alignItems: 'center', // to align buttons in the center
-    backgroundColor: '#F0F0F0', 
-  },
-  button: {
-    backgroundColor: '#007BFF', // Bootstrap primary button color, you can change as needed
-    paddingHorizontal: 20, // horizontal padding
-    paddingVertical: 10, // vertical padding
-    borderRadius: 5, // rounded corners
-    marginBottom: 10, // space between the buttons
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 16, // you can change the size as needed
-  },
-});
-
-export default StudentManagementLinks;
+        <View style={globalStyles.linksContainer}>
+          <TouchableOpacity 
+              onPress={() => navigation.navigate('AdminAddStudents')} 
+              style={globalStyles.button}
+          >
+            <Text style={globalStyles.buttonText}>Add Student or Bulk Upload</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+              onPress={() => navigation.navigate('AdminEditStudents')} 
+              style={globalStyles.button}
+          >
+            <Text style={globalStyles.buttonText}>Edit Student</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    };
+    
+    export default StudentManagementLinks;
