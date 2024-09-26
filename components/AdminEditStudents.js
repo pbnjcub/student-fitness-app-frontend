@@ -61,7 +61,6 @@ const AdminEditStudents = () => {
         setFilteredStudents(filtered);
     };
     
-
     const handleEditClick = (student) => {
         setUpdatedStudent(student);
         setShowEditForm(true);
