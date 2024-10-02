@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { uploadStudent } from '../actions/admin';
-import { showAlert } from '../utilities/alertUtil';
-import BulkStudentUploadBtn from './AdminBulkStudentUploadBtn';
-import { useAdminContext } from '../contexts/AdminContext';
-import GlobalStyles from '../styles/globalStyles';
+import { uploadStudent } from '../../actions/admin';
+import { showAlert } from '../../utilities/alertUtil';
+import BulkStudentUploadBtn from '../../components/AdminBulkStudentUploadBtn';
+import { useAdminContext } from '../../contexts/AdminContext';
+import GlobalStyles from '../../styles/globalStyles';
 
 const AdminAddStudents = ({ onUploadSuccess, onUploadError }) => {
     const { addStudent, addMultipleStudents } = useAdminContext();

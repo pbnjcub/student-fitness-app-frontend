@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, TouchableOpacity, Picker } from 'react-native';
 
-import { useAdminContext } from '../contexts/AdminContext';
-import { editStudent } from '../actions/admin';
-import { showAlert } from '../utilities/alertUtil';
+import { useAdminContext } from '../../contexts/AdminContext';
+import { editStudent } from '../../actions/admin';
+import { showAlert } from '../../utilities/alertUtil';
 
-import FilteredUsersList from './FilteredUsersList';
-import SearchInput from './SearchInput';
+import FilteredUsersList from '../../components/FilteredUsersList';
+import SearchInput from '../../components/SearchInput';
 
-import GlobalStyles from '../styles/globalStyles';
+import GlobalStyles from '../../styles/globalStyles';
 
 const AdminEditStudents = () => {
     const { students, addEditedStudent } = useAdminContext();

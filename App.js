@@ -1,38 +1,15 @@
 import React from 'react';
-
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { NavigationContainer } from '@react-navigation/native';
-import { View, StyleSheet } from 'react-native'; // import View and StyleSheet
-
-import Home from './components/Home';
-import AdminDashboard from './components/AdminDashboard';
-import AdminAddStudents from './components/AdminAddStudents';
-import AdminEditStudents from './components/AdminEditStudents';
-
-import { AdminProvider } from './contexts/AdminContext'; // import the AdminProvider component
-
-const Drawer = createDrawerNavigator();
+import './gesture-handler'; // Import gesture-handler before any other react-native modules
+import { Provider as PaperProvider } from 'react-native-paper';
+import AppNavigator from './src/navigation/AppNavigator'; // Import AppNavigator
+import { AdminProvider } from './src/contexts/AdminContext'; // Import AdminProvider
 
 export default function App() {
   return (
-    <NavigationContainer>
+    <PaperProvider>
       <AdminProvider>
-        <View style={styles.container}>
-          <Drawer.Navigator initialRouteName="Home">
-            <Drawer.Screen name="Home" component={Home} options={{ title: 'Home' }} />
-            <Drawer.Screen name="AdminDashboard" component={AdminDashboard} options={{ title: 'Admin Dashboard' }} />
-            <Drawer.Screen name="AdminAddStudents" component={AdminAddStudents} options={{ title: 'Add Students' }} />
-            <Drawer.Screen name="AdminEditStudents" component={AdminEditStudents} options={{ title: 'Edit Students' }} />
-          </Drawer.Navigator>
-        </View>
+        <AppNavigator /> {/* Use AppNavigator here */}
       </AdminProvider>
-    </NavigationContainer>
+    </PaperProvider>
   );
 }
-
-const styles = StyleSheet.create({ 
-  container: {
-    flex: 1, 
-    backgroundColor: 'white', // set background color to white
-  },
-});

@@ -1,8 +1,8 @@
 import React from 'react';
 import { StatusBar, View, Text, StyleSheet, Dimensions } from 'react-native';
 
-import StudentManagementLinks from './AdminStudentManagementLinks';
-import { useAdminContext } from '../contexts/AdminContext';
+import StudentManagementLinks from '../../components/AdminStudentManagementLinks';
+import { useAdminContext } from '../../contexts/AdminContext';
 
 const AdminDashboard = () => {
   const { students, errors, isLoading } = useAdminContext();

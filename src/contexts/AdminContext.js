@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { getAllStudents } from '../actions/admin'; // Correct the path
+import { getAllStudents } from '../actions/admin';
 
 const AdminContext = createContext();
 
