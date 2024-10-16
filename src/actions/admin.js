@@ -1,6 +1,6 @@
 export const getAllStudents = async () => {
   try {
-    const response = await fetch('http://localhost:3000/api/students', {
+    const response = await fetch('http://localhost:3000/api/users/student', {
       method: 'GET',
       mode: 'cors',
       credentials: 'include',

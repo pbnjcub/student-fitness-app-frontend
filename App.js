@@ -1,5 +1,5 @@
 import React from 'react';
-import './gesture-handler'; // Import gesture-handler before any other react-native modules
+import 'react-native-gesture-handler'; 
 import { Provider as PaperProvider } from 'react-native-paper';
 import AppNavigator from './src/navigation/AppNavigator'; // Import AppNavigator
 import { AdminProvider } from './src/contexts/AdminContext'; // Import AdminProvider

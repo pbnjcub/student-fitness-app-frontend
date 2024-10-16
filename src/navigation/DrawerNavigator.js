@@ -1,9 +1,10 @@
 import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import Home from '../screens/Home'; // Import your Home component
-import AdminDashboard from '../screens/admin/AdminDashboard'; // Import your AdminDashboard component
-import AdminAddStudents from '../screens/admin/AdminAddStudents'; // Import your AdminAddStudents component
-import AdminEditStudents from '../screens/admin/AdminEditStudents'; // Import your AdminEditStudents component
+import Home from '../views/Home'; // Import your Home component
+import AdminDashboard from '../views/admin/AdminDashboard'; // Import your AdminDashboard component
+import AdminAddStudents from '../views/admin/AdminAddStudents'; // Import your AdminAddStudents component
+import AdminEditStudents from '../views/admin/AdminEditStudents'; // Import your AdminEditStudents component
+import AdminListStudentView from '../views/admin/AdminListStudentView';
 import CustomDrawerItem from './CustomDrawerItem'; // Import your custom drawer item
 
 const Drawer = createDrawerNavigator();
@@ -47,6 +48,13 @@ const DrawerNavigator = () => {
         component={AdminEditStudents} 
         options={{ 
           drawerItem: (props) => <CustomDrawerItem label="Edit Students" {...props} />
+        }} 
+      />
+      <Drawer.Screen 
+        name="AdminListStudentView"  // Add the new screen
+        component={AdminListStudentView}  // Link the new component here
+        options={{ 
+          drawerItem: (props) => <CustomDrawerItem label="List Students" {...props} />  // Customize label as needed
         }} 
       />
     </Drawer.Navigator>
