@@ -1,91 +1,66 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import UserCard from './UserCard';
 
-const StudentCard = ({ student }) => {
-  const { name, gradeLevel, sectionCode, weight, height, photoUrl } = student;
-
-  return (
-    <View style={styles.cardContainer}>
-      {/* Student Photo or Placeholder */}
-      {photoUrl ? (
-        <Image source={{ uri: photoUrl }} style={styles.photo} />
-      ) : (
-        <View style={styles.photoPlaceholder}>
-          <Text style={styles.photoPlaceholderText}>Student Photo</Text>
-        </View>
-      )}
-
-      {/* Student Info */}
-      <View style={styles.infoContainer}>
-        {/* Student Name and Section */}
-        <Text style={styles.studentName}>{name}</Text>
-        <Text style={styles.gradeLevel}>Grade: {gradeLevel}</Text>
-        <Text style={styles.sectionCode}>Section: {sectionCode}</Text>
-
-        {/* Anthro Data */}
-        <View style={styles.anthroContainer}>
-          <Text style={styles.anthroText}>Weight: {weight} kg</Text>
-          <Text style={styles.anthroText}>Height: {height} cm</Text>
-        </View>
-      </View>
+const StudentCard = ({ student, cardWidth }) => (
+  <View style={[styles.card, { width: cardWidth }]}>
+    {/* User Information (from UserCard) */}
+    <View style={styles.userInfoContainer}>
+      <UserCard user={student} cardWidth={cardWidth} />
     </View>
-  );
-};
+
+    {/* Additional Student-Specific Information */}
+    <View style={styles.additionalInfoContainer}>
+      <Text style={styles.details}>
+        <Text style={styles.label}>Graduation Year:</Text> {student.studentDetails?.gradYear || 'N/A'}
+      </Text>
+      <Text style={styles.details}>
+        <Text style={styles.label}>Section Code:</Text> {student.sectionCode || 'Unrostered'}
+      </Text>
+      <Text style={styles.details}>
+        <Text style={styles.label}>Gender Identity:</Text> {student.genderIdentity || 'Not specified'}
+      </Text>
+      <Text style={styles.details}>
+        <Text style={styles.label}>Pronouns:</Text> {student.pronouns || 'N/A'}
+      </Text>
+      <Text style={styles.details}>
+        <Text style={styles.label}>Weight:</Text> 70kg (dummy)
+      </Text>
+      <Text style={styles.details}>
+        <Text style={styles.label}>Height:</Text> 180cm (dummy)
+      </Text>
+    </View>
+  </View>
+);
 
 const styles = StyleSheet.create({
-  cardContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderRadius: 10,
+  card: {
+    backgroundColor: '#f9f9f9',
     padding: 10,
-    marginVertical: 10,
+    margin: 10,
+    borderRadius: 8,
     shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 6,
+    shadowRadius: 5,
     elevation: 2,
-    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
   },
-  photo: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginRight: 15,
+  userInfoContainer: {
+    marginBottom: 10, // Create spacing between user info and additional info
   },
-  photoPlaceholder: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 15,
+  additionalInfoContainer: {
+    paddingHorizontal: 10,
   },
-  photoPlaceholderText: {
+  details: {
     fontSize: 12,
-    color: '#aaa',
-    textAlign: 'center',
-  },
-  infoContainer: {
-    flex: 1,
-  },
-  studentName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  gradeLevel: {
-    fontSize: 16,
-    marginTop: 4,
-  },
-  sectionCode: {
-    fontSize: 16,
-    marginTop: 4,
-  },
-  anthroContainer: {
-    marginTop: 10,
-  },
-  anthroText: {
-    fontSize: 14,
     color: '#555',
+    marginBottom: 5,
+  },
+  label: {
+    fontWeight: 'bold',
+    color: '#333',
   },
 });
 

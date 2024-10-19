@@ -45,7 +45,6 @@ const AdminListStudentView = () => {
       try {
         setLoading(true);
         const fetchedStudents = await getAllStudents(page, STUDENTS_PER_PAGE); // Assume your API supports page and limit parameters
-        console.log('Fetched students:', fetchedStudents);
         setStudents(fetchedStudents.students); // Update the list of students
         setTotalPages(fetchedStudents.totalPages); // Set the total number of pages based on server response
         setFilteredStudents(fetchedStudents.students);
