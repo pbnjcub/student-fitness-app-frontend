@@ -1,69 +1,90 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Image, FlatList } from 'react-native';
 
-const ListStudents = ({ students }) => {
-  return (
-    <View style={styles.container}>
-      {students.length > 0 ? (
-        students.map((student) => (
-          <View key={student.id} style={styles.card}>
-            {/* Student photo */}
-            <View style={styles.photoContainer}>
-              {student.photoUrl ? (
-                <Image source={{ uri: student.photoUrl }} style={styles.photo} />
-              ) : (
-                <View style={styles.placeholderContainer}>
-                  <Text style={styles.placeholderText}>Student Photo</Text>
-                </View>
-              )}
-            </View>
+const ListStudents = ({ students, columnCount, cardWidth = 300 }) => {
+  const [hoveredCardId, setHoveredCardId] = useState(null);
 
-            {/* Student info */}
-            <View style={styles.infoContainer}>
-              <Text style={styles.name}>{`${student.firstName} ${student.lastName}`}</Text>
-
-              {/* Safe access for gradYear */}
-              <Text style={styles.details}>
-                Graduation Year: {student.studentDetails?.gradYear || 'N/A'}
-              </Text>
-
-              <Text style={styles.details}>Email: {student.email}</Text>
-              <Text style={styles.details}>
-                Gender Identity: {student.genderIdentity || 'Not specified'}
-              </Text>
-              <Text style={styles.details}>Pronouns: {student.pronouns || 'N/A'}</Text>
-
-              {/* Dummy anthropometric data */}
-              <Text style={styles.details}>Weight: 70kg (dummy)</Text>
-              <Text style={styles.details}>Height: 180cm (dummy)</Text>
-            </View>
+  const renderStudentCard = ({ item }) => (
+    <View
+      style={[
+        styles.card,
+        { width: cardWidth },
+        hoveredCardId === item.id ? styles.cardHovered : null,
+      ]}
+      onMouseEnter={() => setHoveredCardId(item.id)}
+      onMouseLeave={() => setHoveredCardId(null)}
+    >
+      <View style={styles.photoContainer}>
+        {item.photoUrl ? (
+          <Image source={{ uri: item.photoUrl }} style={styles.photo} />
+        ) : (
+          <View style={styles.placeholderContainer}>
+            <Text style={styles.placeholderText}>Student Photo</Text>
           </View>
-        ))
-      ) : (
-        <Text>No students to display.</Text>
-      )}
+        )}
+      </View>
+      <View style={styles.infoContainer}>
+        <Text style={styles.name}>{`${item.firstName} ${item.lastName}`}</Text>
+        <Text style={styles.details}>
+          <Text style={styles.label}>Graduation Year:</Text> {item.studentDetails?.gradYear || 'N/A'}
+        </Text>
+        <Text style={styles.details}>
+          <Text style={styles.label}>Email:</Text> {item.email}
+        </Text>
+        <Text style={styles.details}>
+          <Text style={styles.label}>Gender Identity:</Text> {item.genderIdentity || 'Not specified'}
+        </Text>
+        <Text style={styles.details}>
+          <Text style={styles.label}>Pronouns:</Text> {item.pronouns || 'N/A'}
+        </Text>
+        <Text style={styles.details}>
+          <Text style={styles.label}>Weight:</Text> 70kg (dummy)
+        </Text>
+        <Text style={styles.details}>
+          <Text style={styles.label}>Height:</Text> 180cm (dummy)
+        </Text>
+        <Text style={styles.details}>
+          <Text style={styles.label}>Section:</Text> {item.sectionCode  || 'Unrostered'}
+        </Text>
+      </View>
     </View>
+  );
+
+  return (
+    <FlatList
+      data={students}
+      renderItem={renderStudentCard}
+      keyExtractor={(item) => item.id.toString()}
+      numColumns={columnCount}
+      key={columnCount} // Ensure FlatList re-renders when column count changes
+      contentContainerStyle={styles.flatListContainer}
+    />
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginTop: 10,
+  flatListContainer: {
+    paddingBottom: 20,
   },
   card: {
     backgroundColor: '#f9f9f9',
     padding: 10,
-    marginBottom: 10,
+    margin: 10,
     borderRadius: 8,
-    flexDirection: 'row',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 2,
+    borderWidth: 2,
+    borderColor: 'transparent', // Default border color
+  },
+  cardHovered: {
+    borderColor: '#074986', // Border color on hover
   },
   photoContainer: {
-    marginRight: 10,
+    marginBottom: 10,
+    alignItems: 'center',
   },
   photo: {
     width: 60,
@@ -79,19 +100,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   placeholderText: {
-    fontSize: 12,
+    fontSize: 14, // Increased font size for better visibility
     color: '#888',
+    textAlign: 'center', // Center the text within the placeholder
   },
   infoContainer: {
     justifyContent: 'center',
   },
   name: {
-    fontSize: 16,
+    fontSize: 18, // Kept a larger font size for the name
     fontWeight: 'bold',
+    marginBottom: 5,
   },
   details: {
-    fontSize: 14,
+    fontSize: 12, // Smaller font size for details
     color: '#555',
+    marginBottom: 2,
+  },
+  label: {
+    fontStyle: 'italic', // Italicized label for headings
   },
 });
 

@@ -1,51 +1,82 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, StyleSheet, Text, CheckBox, ActivityIndicator } from 'react-native';
+import { View, TextInput, StyleSheet, Text, CheckBox, ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
+import MainBtn from '../../components/btns/MainBtn';
+import { getAllStudents } from '../../actions/admin'; // Update your backend to accept page and limit parameters
 import ListStudents from '../../components/lists/ListStudents';
-import MainBtn from '../../components/btns/MainBtn'; // Assuming this is your button component
-import { getAllStudents } from '../../actions/admin'; // Import your getAllStudents function
 
 const AdminListStudentView = () => {
-  const [students, setStudents] = useState([]); // All students
-  const [filteredStudents, setFilteredStudents] = useState([]); // Filtered students
+  const [students, setStudents] = useState([]);
+  const [filteredStudents, setFilteredStudents] = useState([]);
   const [searchText, setSearchText] = useState('');
-  const [selectedGradYear, setSelectedGradYear] = useState(null); // Filter by graduation year
+  const [selectedGradYear, setSelectedGradYear] = useState(null);
   const [showArchived, setShowArchived] = useState(false);
   const [sectionCode, setSectionCode] = useState('');
-  const [loading, setLoading] = useState(true); // Loading state
+  const [loading, setLoading] = useState(true);
+  const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const CARD_WIDTH = 300;
+  const STUDENTS_PER_PAGE = 24;
+  
+  // Calculate number of columns based on screen width
+  const calculateColumnCount = () => {
+    const availableWidth = screenWidth - 20; // Account for spacing/margins
+    return Math.max(1, Math.floor(availableWidth / CARD_WIDTH));
+  };
+  const columnCount = calculateColumnCount();
+
+  // Set up a listener to handle screen resizing
+  useEffect(() => {
+    const handleResize = ({ window }) => {
+      setScreenWidth(window.width);
+    };
+
+    Dimensions.addEventListener('change', handleResize);
+
+    return () => {
+      Dimensions.removeEventListener('change', handleResize);
+    };
+  }, []);
 
   // Fetch students when component mounts
   useEffect(() => {
-    const fetchStudents = async () => {
+    const fetchStudents = async (page = 1) => {
       try {
-        const fetchedStudents = await getAllStudents(); // Call API to get students
+        setLoading(true);
+        const fetchedStudents = await getAllStudents(page, STUDENTS_PER_PAGE); // Assume your API supports page and limit parameters
         console.log('Fetched students:', fetchedStudents);
-        setStudents(fetchedStudents); // Set all students
-        setFilteredStudents(fetchedStudents); // Set filtered students initially to all students
+        setStudents(fetchedStudents.students); // Update the list of students
+        setTotalPages(fetchedStudents.totalPages); // Set the total number of pages based on server response
+        setFilteredStudents(fetchedStudents.students);
       } catch (error) {
         console.error('Error fetching students:', error);
       } finally {
-        setLoading(false); // Hide loading spinner
+        setLoading(false);
       }
     };
 
-    fetchStudents();
-  }, []);
+    fetchStudents(currentPage);
+  }, [currentPage]);
 
-  // Function to filter students based on search, graduation year, section code, and archived status
+  // Function to filter students based on criteria
   useEffect(() => {
-    let filtered = students.filter((student) => {
+    const filtered = students.filter((student) => {
       const fullName = `${student.firstName} ${student.lastName}`;
       return (
         fullName.toLowerCase().includes(searchText.toLowerCase()) &&
-        (!selectedGradYear || (student.studentDetails && student.studentDetails.gradYear === parseInt(selectedGradYear))) &&
-        (!sectionCode || student.sectionCode === sectionCode) &&
+        (!selectedGradYear || student.studentDetails?.gradYear === parseInt(selectedGradYear)) &&
+        (!sectionCode || (student.sectionCode && student.sectionCode.includes(sectionCode))) &&
         (showArchived || !student.isArchived)
       );
     });
     setFilteredStudents(filtered);
   }, [searchText, selectedGradYear, showArchived, sectionCode, students]);
 
-  // Render loading spinner if data is being fetched
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -56,50 +87,63 @@ const AdminListStudentView = () => {
 
   return (
     <View style={styles.container}>
-      {/* Search bar */}
       <TextInput
         style={styles.input}
         placeholder="Search by name"
         value={searchText}
-        onChangeText={(text) => setSearchText(text)}
+        onChangeText={setSearchText}
       />
-
-      {/* Filter by graduation year */}
       <Text>Filter by Graduation Year:</Text>
       <TextInput
         style={styles.input}
         placeholder="Graduation Year"
         value={selectedGradYear}
-        onChangeText={(text) => setSelectedGradYear(text)}
+        onChangeText={(value) => setSelectedGradYear(value.trim())}
+        keyboardType="numeric"
       />
-
-      {/* Filter by section code */}
       <Text>Filter by Section Code:</Text>
       <TextInput
         style={styles.input}
         placeholder="Section Code"
         value={sectionCode}
-        onChangeText={(text) => setSectionCode(text)}
+        onChangeText={(value) => setSectionCode(value.trim())}
       />
-
-      {/* Show archived students */}
       <View style={styles.checkboxContainer}>
-        <CheckBox
-          value={showArchived}
-          onValueChange={setShowArchived}
-        />
+        <CheckBox value={showArchived} onValueChange={setShowArchived} />
         <Text>Show Archived Students</Text>
       </View>
 
-      {/* ListStudents component */}
-      <ListStudents students={filteredStudents} />
+      <ListStudents students={filteredStudents} columnCount={columnCount} cardWidth={CARD_WIDTH} />
 
-      {/* Pagination buttons (example, could be made more dynamic) */}
+      {/* Pagination Controls */}
       <View style={styles.pagination}>
-        <MainBtn label="Previous" onPress={() => {}} />
-        <MainBtn label="1" onPress={() => {}} />
-        <MainBtn label="2" onPress={() => {}} />
-        <MainBtn label="Next" onPress={() => {}} />
+        <TouchableOpacity
+          disabled={currentPage <= 1}
+          onPress={() => handlePageChange(currentPage - 1)}
+        >
+          <Text style={[styles.pageButton, currentPage <= 1 && styles.disabledButton]}>Previous</Text>
+        </TouchableOpacity>
+
+        {[...Array(totalPages).keys()].map((_, index) => (
+          <TouchableOpacity
+            key={index}
+            onPress={() => handlePageChange(index + 1)}
+          >
+            <Text style={[
+              styles.pageButton,
+              currentPage === index + 1 && styles.activePageButton
+            ]}>
+              {index + 1}
+            </Text>
+          </TouchableOpacity>
+        ))}
+
+        <TouchableOpacity
+          disabled={currentPage >= totalPages}
+          onPress={() => handlePageChange(currentPage + 1)}
+        >
+          <Text style={[styles.pageButton, currentPage >= totalPages && styles.disabledButton]}>Next</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -108,6 +152,7 @@ const AdminListStudentView = () => {
 const styles = StyleSheet.create({
   container: {
     padding: 10,
+    flex: 1,
   },
   input: {
     borderWidth: 1,
@@ -122,8 +167,21 @@ const styles = StyleSheet.create({
   },
   pagination: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginTop: 20,
+  },
+  pageButton: {
+    marginHorizontal: 5,
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 5,
+  },
+  disabledButton: {
+    opacity: 0.3,
+  },
+  activePageButton: {
+    backgroundColor: '#cce7ff',
   },
   loadingContainer: {
     flex: 1,

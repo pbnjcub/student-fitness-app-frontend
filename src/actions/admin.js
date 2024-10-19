@@ -1,6 +1,8 @@
-export const getAllStudents = async () => {
+import { API_BASE_URL } from '@env';
+
+export const getAllStudents = async (page = 1, limit = 24) => {
   try {
-    const response = await fetch('http://localhost:3000/api/users/student', {
+    const response = await fetch(`${API_BASE_URL}/users/student?page=${page}&limit=${limit}`, {
       method: 'GET',
       mode: 'cors',
       credentials: 'include',
@@ -16,11 +18,12 @@ export const getAllStudents = async () => {
     }
 
     const data = await response.json();
-    return data;
+    return data; // Expected to return { students, totalPages, currentPage }
   } catch (error) {
     return { errors: error.messages || 'An error occurred' };
   }
 };
+
 
 // Define the API URL where you want to send the .csv file
 const API_URL = 'http://localhost:3000/api/upload'; // Replace with your actual API endpoint
