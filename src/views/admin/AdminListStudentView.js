@@ -205,6 +205,7 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     opacity: 0.3,
+    backgroundColor: '#FFFFFF',
   },
   activePageButton: {
     backgroundColor: '#FFFFFF',
