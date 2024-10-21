@@ -39,38 +39,48 @@ const AdminListStudentView = () => {
     };
   }, []);
 
-  // Fetch students when component mounts
+  // Fetch students on initial load or when page changes
   useEffect(() => {
-    const fetchStudents = async (page = 1) => {
-      try {
-        setLoading(true);
-        const fetchedStudents = await getAllStudents(page, STUDENTS_PER_PAGE); // Assume your API supports page and limit parameters
-        setStudents(fetchedStudents.students); // Update the list of students
-        setTotalPages(fetchedStudents.totalPages); // Set the total number of pages based on server response
-        setFilteredStudents(fetchedStudents.students);
-      } catch (error) {
-        console.error('Error fetching students:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchStudents(currentPage);
   }, [currentPage]);
 
-  // Function to filter students based on criteria
-  useEffect(() => {
-    const filtered = students.filter((student) => {
-      const fullName = `${student.firstName} ${student.lastName}`;
-      return (
-        fullName.toLowerCase().includes(searchText.toLowerCase()) &&
-        (!selectedGradYear || student.studentDetails?.gradYear === parseInt(selectedGradYear)) &&
-        (!sectionCode || (student.sectionCode && student.sectionCode.includes(sectionCode))) &&
-        (showArchived || !student.isArchived)
-      );
-    });
-    setFilteredStudents(filtered);
-  }, [searchText, selectedGradYear, showArchived, sectionCode, students]);
+  // Fetch students function
+  const fetchStudents = async (page = 1) => {
+    try {
+      setLoading(true);
+      const fetchedStudents = await getAllStudents({
+        page,
+        limit: STUDENTS_PER_PAGE,
+        searchText,
+        graduationYear: selectedGradYear,
+        sectionCode,
+        showArchived,
+      });
+
+      if (fetchedStudents.errors) {
+        console.error('Error fetching students:', fetchedStudents.errors);
+        setStudents([]);
+        setFilteredStudents([]);
+        setTotalPages(1);
+      } else {
+        setStudents(fetchedStudents.students);
+        console.log(fetchedStudents.students);
+        setFilteredStudents(fetchedStudents.students);
+        setTotalPages(fetchedStudents.totalPages);
+      }
+    } catch (error) {
+      console.error('Error fetching students:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to handle search button click
+  const handleSearch = () => {
+    // Start from the first page when initiating a new search
+    setCurrentPage(1);
+    fetchStudents(1);
+  };
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -86,12 +96,19 @@ const AdminListStudentView = () => {
 
   return (
     <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder="Search by name"
-        value={searchText}
-        onChangeText={setSearchText}
-      />
+      <View style={styles.searchRow}>
+        <TextInput
+          style={[styles.input, styles.searchInput]}
+          placeholder="Search by name"
+          value={searchText}
+          onChangeText={setSearchText}
+        />
+        <MainBtn
+          label="Search" // Update to use 'label' instead of 'title'
+          onPress={handleSearch}
+          style={styles.searchButton}
+        />
+      </View>
       <Text>Filter by Graduation Year:</Text>
       <TextInput
         style={styles.input}
@@ -116,33 +133,35 @@ const AdminListStudentView = () => {
 
       {/* Pagination Controls */}
       <View style={styles.pagination}>
-        <TouchableOpacity
-          disabled={currentPage <= 1}
+        <MainBtn
+          label="Previous"
           onPress={() => handlePageChange(currentPage - 1)}
-        >
-          <Text style={[styles.pageButton, currentPage <= 1 && styles.disabledButton]}>Previous</Text>
-        </TouchableOpacity>
+          style={[styles.pageButton, currentPage <= 1 && styles.disabledButton]}
+          textColor={currentPage <= 1 ? '#000000' : undefined}
+          disabled={currentPage <= 1}
+        />
 
         {[...Array(totalPages).keys()].map((_, index) => (
-          <TouchableOpacity
+          <MainBtn
             key={index}
+            label={(index + 1).toString()}
             onPress={() => handlePageChange(index + 1)}
-          >
-            <Text style={[
-              styles.pageButton,
-              currentPage === index + 1 && styles.activePageButton
-            ]}>
-              {index + 1}
-            </Text>
-          </TouchableOpacity>
+            style={
+              currentPage === index + 1
+                ? [styles.activePageButton, styles.activePageText]
+                : styles.pageButton
+            }
+            textColor={currentPage === index + 1 ? '#000000' : undefined}
+          />
         ))}
 
-        <TouchableOpacity
-          disabled={currentPage >= totalPages}
+        <MainBtn
+          label="Next"
           onPress={() => handlePageChange(currentPage + 1)}
-        >
-          <Text style={[styles.pageButton, currentPage >= totalPages && styles.disabledButton]}>Next</Text>
-        </TouchableOpacity>
+          style={[styles.pageButton, currentPage >= totalPages && styles.disabledButton]}
+          textColor={currentPage >= totalPages ? '#000000' : undefined}
+          disabled={currentPage >= totalPages}
+        />
       </View>
     </View>
   );
@@ -153,10 +172,18 @@ const styles = StyleSheet.create({
     padding: 10,
     flex: 1,
   },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  searchInput: {
+    flex: 1, // Takes up available space
+    marginRight: 10, // Space between input and button
+  },
   input: {
     borderWidth: 1,
     padding: 8,
-    marginBottom: 10,
     borderRadius: 5,
   },
   checkboxContainer: {
@@ -180,7 +207,11 @@ const styles = StyleSheet.create({
     opacity: 0.3,
   },
   activePageButton: {
-    backgroundColor: '#cce7ff',
+    backgroundColor: '#FFFFFF',
+    borderColor: '#000000',
+  },
+  activePageText: {
+    color: '#000000',
   },
   loadingContainer: {
     flex: 1,

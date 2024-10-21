@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 
-const UserCard = ({ user, cardWidth = 300 }) => (
-  <View style={[styles.infoContainer, { width: cardWidth }]}>
+const UserCard = ({ user }) => (
+  <View style={styles.infoContainer}>
     <View style={styles.photoContainer}>
       {user.photoUrl ? (
         <Image source={{ uri: user.photoUrl }} style={styles.photo} />
@@ -23,7 +23,7 @@ const UserCard = ({ user, cardWidth = 300 }) => (
 
 const styles = StyleSheet.create({
   infoContainer: {
-    paddingVertical: 10, // Adjust padding to match the StudentCard
+    paddingVertical: 10, // Match the StudentCard padding for consistency
   },
   photoContainer: {
     marginBottom: 10,
@@ -40,12 +40,11 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     backgroundColor: '#ddd',
     alignItems: 'center',
-    justifyContent: 'center', // Ensures vertical alignment
-    display: 'flex',
+    justifyContent: 'center',
   },
   placeholderText: {
     color: '#888',
-    textAlign: 'center', // Ensure the text is centered horizontally
+    textAlign: 'center',
   },
   info: {
     justifyContent: 'center',
@@ -54,15 +53,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
-    color: '#333', // Match styling with StudentCard component
+    color: '#333',
   },
   details: {
     fontSize: 12,
     color: '#555',
-    marginBottom: 5, // Consistent spacing
+    marginBottom: 5,
   },
   label: {
-    fontWeight: 'bold', // Consistent styling for labels
+    fontWeight: 'bold',
     color: '#333',
   },
 });

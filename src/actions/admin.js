@@ -1,8 +1,21 @@
 import { API_BASE_URL } from '@env';
 
-export const getAllStudents = async (page = 1, limit = 24) => {
+export const getAllStudents = async ({ page = 1, limit = 24, searchText = '', graduationYear = '', sectionCode = '', showArchived = false }) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/student?page=${page}&limit=${limit}`, {
+    // Construct URLSearchParams for query parameters
+    const params = new URLSearchParams({
+      page,
+      limit,
+    });
+
+    // Add optional parameters if they are provided
+    if (searchText) params.append('searchText', searchText);
+    if (graduationYear) params.append('graduationYear', graduationYear);
+    if (sectionCode) params.append('sectionCode', sectionCode);
+    if (showArchived) params.append('showArchived', showArchived);
+
+    // Make the request to the API endpoint with the constructed query string
+    const response = await fetch(`${API_BASE_URL}/users/student?${params.toString()}`, {
       method: 'GET',
       mode: 'cors',
       credentials: 'include',
@@ -12,17 +25,32 @@ export const getAllStudents = async (page = 1, limit = 24) => {
       },
     });
 
+    // Check if the response is OK (status code 200-299)
     if (!response.ok) {
-      const errorData = await response.json();
-      throw errorData;
+      // Attempt to parse JSON if response is not OK
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        throw errorData;
+      } else {
+        // Response is not JSON, likely an HTML error page
+        throw new Error(`Unexpected response from server: ${response.status} - ${response.statusText}`);
+      }
     }
 
+    // Parse the response as JSON
     const data = await response.json();
     return data; // Expected to return { students, totalPages, currentPage }
   } catch (error) {
-    return { errors: error.messages || 'An error occurred' };
+    console.error('Error fetching students:', error);
+    return { errors: error.message || 'An error occurred' };
   }
 };
+
+
+
+
+
 
 
 // Define the API URL where you want to send the .csv file

@@ -1,29 +1,31 @@
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
 
-const MainBtn = ({ label, onPress, style }) => {
-  const [isHovered, setIsHovered] = useState(false); // State to manage hover
+const MainBtn = ({ label, onPress, style, textColor }) => {
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <Pressable
       onPress={onPress}
-      onHoverIn={() => setIsHovered(true)} // Set hover state to true when hovered
-      onHoverOut={() => setIsHovered(false)} // Set hover state to false when not hovered
+      onHoverIn={() => setIsHovered(true)}
+      onHoverOut={() => setIsHovered(false)}
       style={({ pressed }) => [
         styles.button,
         {
-          backgroundColor: isHovered ? '#FFFFFF' : '#404040', // Change background color on hover
-          borderColor: isHovered ? '#404040' : '#FFFFF', // Optional: change border color on hover
+          backgroundColor: isHovered ? '#FFFFFF' : '#404040',
+          borderColor: isHovered ? '#404040' : '#FFFFF',
         },
-        style, // Allow custom styles to be passed in
+        style,
       ]}
     >
-      <Text style={[styles.buttonText, { color: isHovered ? '#404040' : '#FFFFFF' }]}>
+      <Text style={[styles.buttonText, { color: textColor || (isHovered ? '#404040' : '#FFFFFF') }]}>
         {label}
       </Text>
     </Pressable>
   );
 };
+
+
 
 const styles = StyleSheet.create({
   button: {
