@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, StyleSheet, Text, CheckBox, ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
 import MainBtn from '../../components/btns/MainBtn';
-import { getAllStudents } from '../../actions/admin'; // Update your backend to accept page and limit parameters
+import TextField from '../../components/forms/TextField'; // Import your TextField component
+import { getAllStudents } from '../../actions/admin';
 import ListStudents from '../../components/lists/ListStudents';
 
 const AdminListStudentView = () => {
@@ -18,15 +19,14 @@ const AdminListStudentView = () => {
 
   const CARD_WIDTH = 300;
   const STUDENTS_PER_PAGE = 24;
-  
-  // Calculate number of columns based on screen width
+
   const calculateColumnCount = () => {
-    const availableWidth = screenWidth - 20; // Account for spacing/margins
+    const availableWidth = screenWidth - 20; 
     return Math.max(1, Math.floor(availableWidth / CARD_WIDTH));
   };
+
   const columnCount = calculateColumnCount();
 
-  // Set up a listener to handle screen resizing
   useEffect(() => {
     const handleResize = ({ window }) => {
       setScreenWidth(window.width);
@@ -39,12 +39,10 @@ const AdminListStudentView = () => {
     };
   }, []);
 
-  // Fetch students on initial load or when page changes
   useEffect(() => {
     fetchStudents(currentPage);
   }, [currentPage]);
 
-  // Fetch students function
   const fetchStudents = async (page = 1) => {
     try {
       setLoading(true);
@@ -64,7 +62,6 @@ const AdminListStudentView = () => {
         setTotalPages(1);
       } else {
         setStudents(fetchedStudents.students);
-        console.log(fetchedStudents.students);
         setFilteredStudents(fetchedStudents.students);
         setTotalPages(fetchedStudents.totalPages);
       }
@@ -75,9 +72,7 @@ const AdminListStudentView = () => {
     }
   };
 
-  // Function to handle search button click
   const handleSearch = () => {
-    // Start from the first page when initiating a new search
     setCurrentPage(1);
     fetchStudents(1);
   };
@@ -97,14 +92,13 @@ const AdminListStudentView = () => {
   return (
     <View style={styles.container}>
       <View style={styles.searchRow}>
-        <TextInput
-          style={[styles.input, styles.searchInput]}
-          placeholder="Search by name"
-          value={searchText}
-          onChangeText={setSearchText}
+        <TextField
+          value={searchText}          // Pass the searchText state
+          placeholder="Search by first, last or full name"
+          onChange={setSearchText}    // Update searchText when the input changes
         />
         <MainBtn
-          label="Search" // Update to use 'label' instead of 'title'
+          label="Search"
           onPress={handleSearch}
           style={styles.searchButton}
         />
@@ -131,7 +125,6 @@ const AdminListStudentView = () => {
 
       <ListStudents students={filteredStudents} columnCount={columnCount} cardWidth={CARD_WIDTH} />
 
-      {/* Pagination Controls */}
       <View style={styles.pagination}>
         <MainBtn
           label="Previous"
@@ -177,9 +170,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-  searchInput: {
-    flex: 1, // Takes up available space
-    marginRight: 10, // Space between input and button
+  searchButton: {
+    // You can style your search button here
   },
   input: {
     borderWidth: 1,
