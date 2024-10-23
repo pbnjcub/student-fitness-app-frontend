@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { View, TextInput, StyleSheet, Text, CheckBox, ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
 import MainBtn from '../../components/btns/MainBtn';
-import TextField from '../../components/forms/TextField'; // Import your TextField component
-import { getAllStudents } from '../../actions/admin';
+import TextField from '../../components/forms/TextField';
+import DropDownMenu from '../../components/forms/DropDownMenu'; 
+import { getAllStudents, getAllSectionCodes } from '../../actions/admin';
 import ListStudents from '../../components/lists/ListStudents';
 
 const AdminListStudentView = () => {
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [searchText, setSearchText] = useState('');
+  const [graduationYears, setGraduationYears] = useState([]);
   const [selectedGradYear, setSelectedGradYear] = useState(null);
   const [showArchived, setShowArchived] = useState(false);
-  const [sectionCode, setSectionCode] = useState('');
   const [loading, setLoading] = useState(true);
   const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [sectionCodes, setSectionCodes] = useState([]);
+  const [selectedSectionCode, setSelectedSectionCode] = useState('');
 
   const CARD_WIDTH = 300;
   const STUDENTS_PER_PAGE = 24;
@@ -40,10 +43,10 @@ const AdminListStudentView = () => {
   }, []);
 
   useEffect(() => {
-    fetchStudents(currentPage);
+    fetchStudents(currentPage, true);
   }, [currentPage]);
 
-  const fetchStudents = async (page = 1) => {
+  const fetchStudents = async (page = 1, updateGradYears = false) => {
     try {
       setLoading(true);
       const fetchedStudents = await getAllStudents({
@@ -51,9 +54,16 @@ const AdminListStudentView = () => {
         limit: STUDENTS_PER_PAGE,
         searchText,
         graduationYear: selectedGradYear,
-        sectionCode,
+        sectionCode: selectedSectionCode,
         showArchived,
       });
+
+      // Extract all unique graduation years from the fetched students
+      if (updateGradYears) {
+        const uniqueGradYears = Array.from(new Set(fetchedStudents.students.map((student) => student.studentDetails.gradYear)));
+        const sortedUniqueGradYears = uniqueGradYears.sort((a, b) => a - b);
+        setGraduationYears(sortedUniqueGradYears);
+      }
 
       if (fetchedStudents.errors) {
         console.error('Error fetching students:', fetchedStudents.errors);
@@ -71,6 +81,26 @@ const AdminListStudentView = () => {
       setLoading(false);
     }
   };
+  
+
+  useEffect(() => {
+    const fetchSectionCodes = async () => {
+      try {
+        const fetchedSectionCodes = await getAllSectionCodes();
+        setSectionCodes(fetchedSectionCodes);
+      } catch (error) {
+        console.error('Error fetching section codes:', error);
+      }
+    };
+  
+    fetchSectionCodes();
+  }, []); // Dependency array is empty to ensure this runs once on component mount
+  
+  useEffect(() => {
+    // Fetch students for the newly selected section when the section code changes
+    fetchStudents(1, false);  // Reset to page 1 when section changes
+  }, [selectedSectionCode, selectedGradYear]);  // This effect depends on `selectedSectionCode`
+  
 
   const handleSearch = () => {
     setCurrentPage(1);
@@ -79,6 +109,14 @@ const AdminListStudentView = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+  };
+
+  const handleSectionCodeChange = (value) => {
+    setSelectedSectionCode(value);
+  };
+
+  const handleGradYearChange = (value) => {
+    setSelectedGradYear(value);
   };
 
   if (loading) {
@@ -104,19 +142,18 @@ const AdminListStudentView = () => {
         />
       </View>
       <Text>Filter by Graduation Year:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Graduation Year"
-        value={selectedGradYear}
-        onChangeText={(value) => setSelectedGradYear(value.trim())}
-        keyboardType="numeric"
+      <DropDownMenu
+        options={graduationYears}
+        selectedValue={selectedGradYear}
+        onValueChange={handleGradYearChange}
+        placeholder="Choose a Graduation Year"
       />
       <Text>Filter by Section Code:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Section Code"
-        value={sectionCode}
-        onChangeText={(value) => setSectionCode(value.trim())}
+      <DropDownMenu
+        options={sectionCodes}
+        selectedValue={selectedSectionCode}
+        onValueChange={handleSectionCodeChange}
+        placeholder="Choose a Section"
       />
       <View style={styles.checkboxContainer}>
         <CheckBox value={showArchived} onValueChange={setShowArchived} />

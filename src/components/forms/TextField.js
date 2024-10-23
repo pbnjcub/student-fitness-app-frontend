@@ -28,7 +28,8 @@ const styles = StyleSheet.create({
         borderColor: '#000000',  // Default border color
         padding: 8,
         borderRadius: 5,
-        flex: 1,
+        width: 300,
+        // flex: 1,
         marginRight: 10,
     },
     inputFocused: {

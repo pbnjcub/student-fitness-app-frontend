@@ -47,6 +47,48 @@ export const getAllStudents = async ({ page = 1, limit = 24, searchText = '', gr
   }
 };
 
+export const getAllSectionCodes = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/sections/active`, {
+      method: 'GET',
+      mode: 'cors',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Failed to fetch section codes: ${errorData.message}`);
+    }
+  
+    const data = await response.json();
+    const sectionCodes = data.map(({ sectionCode }) => sectionCode);
+
+    const sortedSectionCodes = sectionCodes.sort((a, b) => {
+      const firstFourA = parseInt(a.split('-')[0], 10);
+      const firstFourB = parseInt(b.split('-')[0], 10);
+
+      if (firstFourA !== firstFourB) {
+        return firstFourA - firstFourB;
+      }
+
+      const secondTwoA = parseInt(a.split('-')[1], 10);
+      const secondTwoB = parseInt(b.split('-')[1], 10);
+
+      return secondTwoA - secondTwoB;
+    });
+
+    return sortedSectionCodes;
+  } catch (error) {
+    console.error('Error fetching section codes:', error);
+    return { errors: error.message || 'An error occurred' };
+  }
+};
+
+
 
 
 
