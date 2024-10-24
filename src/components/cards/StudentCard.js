@@ -1,47 +1,52 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import UserCard from './UserCard';
 
-const StudentCard = ({ student, cardWidth }) => {
+const StudentCard = ({ student, cardWidth, onCardPress }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <View
-      style={[
-        styles.card,
-        { width: cardWidth },
-        isHovered ? styles.cardHovered : null,
-      ]}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* User Information (from UserCard) */}
-      <View style={styles.userInfoContainer}>
-        <UserCard user={student} />
-      </View>
+    <TouchableOpacity onPress={onCardPress} activeOpacity={0.8}>
+      <View
+        style={[
+          styles.card,
+          { width: cardWidth },
+          isHovered ? styles.cardHovered : null,
+        ]}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {/* User Information (from UserCard) */}
+        <View style={styles.userInfoContainer}>
+          <UserCard user={student} />
+        </View>
 
-      {/* Additional Student-Specific Information */}
-      <View style={styles.additionalInfoContainer}>
-        <Text style={styles.details}>
-          <Text style={styles.label}>Graduation Year:</Text> {student.studentDetails?.gradYear || 'N/A'}
-        </Text>
-        <Text style={styles.details}>
-          <Text style={styles.label}>Section Code:</Text> {student.sectionCode || 'Unrostered'}
-        </Text>
-        <Text style={styles.details}>
-          <Text style={styles.label}>Gender Identity:</Text> {student.genderIdentity || 'Not specified'}
-        </Text>
-        <Text style={styles.details}>
-          <Text style={styles.label}>Pronouns:</Text> {student.pronouns || 'N/A'}
-        </Text>
-        <Text style={styles.details}>
-          <Text style={styles.label}>Weight:</Text> 70kg (dummy)
-        </Text>
-        <Text style={styles.details}>
-          <Text style={styles.label}>Height:</Text> 180cm (dummy)
-        </Text>
+        {/* Additional Student-Specific Information */}
+        <View style={styles.additionalInfoContainer}>
+          <Text style={styles.details}>
+            <Text style={styles.label}>Birthday:</Text> {student.birthDate || 'N/A'}
+          </Text>
+          <Text style={styles.details}>
+            <Text style={styles.label}>Graduation Year:</Text> {student.studentDetails?.gradYear || 'N/A'}
+          </Text>
+          <Text style={styles.details}>
+            <Text style={styles.label}>Section Code:</Text> {student.sectionCode || 'Unrostered'}
+          </Text>
+          <Text style={styles.details}>
+            <Text style={styles.label}>Gender Identity:</Text> {student.genderIdentity || 'Not specified'}
+          </Text>
+          <Text style={styles.details}>
+            <Text style={styles.label}>Pronouns:</Text> {student.pronouns || 'Not specified'}
+          </Text>
+          <Text style={styles.details}>
+            <Text style={styles.label}>Weight:</Text> 70kg (dummy)
+          </Text>
+          <Text style={styles.details}>
+            <Text style={styles.label}>Height:</Text> 180cm (dummy)
+          </Text>
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

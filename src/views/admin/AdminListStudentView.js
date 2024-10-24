@@ -5,6 +5,7 @@ import TextField from '../../components/forms/TextField';
 import DropDownMenu from '../../components/forms/DropDownMenu'; 
 import { getAllStudents, getAllSectionCodes } from '../../actions/admin';
 import ListStudents from '../../components/lists/ListStudents';
+import ModalTemplateA from '../../components/modals/ModalTemplateA';
 
 const AdminListStudentView = () => {
   const [students, setStudents] = useState([]);
@@ -19,6 +20,8 @@ const AdminListStudentView = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [sectionCodes, setSectionCodes] = useState([]);
   const [selectedSectionCode, setSelectedSectionCode] = useState('');
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const CARD_WIDTH = 300;
   const STUDENTS_PER_PAGE = 24;
@@ -57,7 +60,7 @@ const AdminListStudentView = () => {
         sectionCode: selectedSectionCode,
         showArchived,
       });
-
+      console.log('fetchedStudents:', fetchedStudents);
       // Extract all unique graduation years from the fetched students
       if (updateGradYears) {
         const uniqueGradYears = Array.from(new Set(fetchedStudents.students.map((student) => student.studentDetails.gradYear)));
@@ -99,7 +102,7 @@ const AdminListStudentView = () => {
   useEffect(() => {
     // Fetch students for the newly selected section when the section code changes
     fetchStudents(1, false);  // Reset to page 1 when section changes
-  }, [selectedSectionCode, selectedGradYear]);  // This effect depends on `selectedSectionCode`
+  }, [selectedSectionCode, selectedGradYear, showArchived]);  // This effect depends on `selectedSectionCode`
   
 
   const handleSearch = () => {
@@ -118,6 +121,12 @@ const AdminListStudentView = () => {
   const handleGradYearChange = (value) => {
     setSelectedGradYear(value);
   };
+
+  const handleCardClick = (student) => {
+    setSelectedStudent(student);
+    setIsModalVisible(true);  // Show the modal when a card is clicked
+  };
+  
 
   if (loading) {
     return (
@@ -160,7 +169,34 @@ const AdminListStudentView = () => {
         <Text>Show Archived Students</Text>
       </View>
 
-      <ListStudents students={filteredStudents} columnCount={columnCount} cardWidth={CARD_WIDTH} />
+      <ListStudents
+        students={filteredStudents}
+        columnCount={columnCount}
+        cardWidth={CARD_WIDTH}
+        handleCardClick={handleCardClick}
+      />
+
+      {/* Modal for displaying student details */}
+      <ModalTemplateA
+        isVisible={isModalVisible}
+        title="Student Details"
+        photo={selectedStudent ? selectedStudent.photoUrl : null}
+        body={selectedStudent && (
+          <View>
+            <Text>Name: {selectedStudent.firstName} {selectedStudent.lastName}</Text>
+            <Text>Email: {selectedStudent.email}</Text>
+            <Text>Graduation Year: {selectedStudent.studentDetails.gradYear}</Text>
+            <Text>Gender Identity: {selectedStudent.genderIdentity}</Text>
+            <Text>Pronouns: {selectedStudent.pronouns}</Text>
+          </View>
+        )}
+        toolbarActions={[
+          { label: 'Edit User Data', onPress: () => console.log('Edit User Data') },
+          { label: 'Update Anthro', onPress: () => console.log('Update Anthro') },
+          { label: 'Update Fitness Data', onPress: () => console.log('Update Fitness Data') },
+        ]}
+        onClose={() => setIsModalVisible(false)}  // Close modal
+      />
 
       <View style={styles.pagination}>
         <MainBtn

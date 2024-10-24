@@ -2,9 +2,13 @@ import React from 'react';
 import { FlatList, StyleSheet } from 'react-native';
 import StudentCard from '../cards/StudentCard';
 
-const ListStudents = ({ students, columnCount, cardWidth = 300 }) => {
+const ListStudents = ({ students, columnCount, cardWidth = 300, handleCardClick }) => {
   const renderStudentCard = ({ item }) => (
-    <StudentCard student={item} cardWidth={cardWidth} />
+    <StudentCard
+      student={item}
+      cardWidth={cardWidth}
+      onCardPress={() => handleCardClick(item)} // Pass the student object to handleCardClick
+    />
   );
 
   return (
