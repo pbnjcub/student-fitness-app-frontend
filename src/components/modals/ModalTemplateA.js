@@ -1,13 +1,24 @@
 import React from 'react';
-import { Modal, View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { Modal, View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import MainBtn from '../btns/MainBtn'; // Import MainBtn component
 
-const ModalTemplateA = ({ isVisible, title, body, footer, photo, toolbarActions, onClose, animationType = "slide" }) => {
+const ModalTemplateA = ({
+  isVisible,
+  title,
+  column1 = { labels: [], values: [] },  // Props for the first column
+  column2 = { labels: [], values: [] },  // Props for the second column
+  footer,
+  photo,
+  toolbarActions,
+  onClose,
+  animationType = "slide",
+}) => {
   return (
     <Modal
       visible={isVisible}
       transparent={true}
       animationType={animationType}
-      onRequestClose={onClose}  // Handle back button press on Android
+      onRequestClose={onClose}
     >
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
@@ -16,20 +27,23 @@ const ModalTemplateA = ({ isVisible, title, body, footer, photo, toolbarActions,
             <Text style={styles.modalTitle}>{title}</Text>
 
             <View style={styles.headerActions}>
-              {/* Toolbar actions */}
-              {toolbarActions && (
+              {toolbarActions && toolbarActions.length > 0 && (
                 <View style={styles.toolbar}>
                   {toolbarActions.map((action, index) => (
-                    <TouchableOpacity key={index} onPress={action.onPress} style={styles.actionButton}>
-                      <Text style={styles.actionButtonText}>{action.label}</Text>
-                    </TouchableOpacity>
+                    <MainBtn
+                      key={index}
+                      label={action.label}
+                      onPress={action.onPress}
+                      style={styles.actionButton}
+                    />
                   ))}
                 </View>
               )}
-              {/* Close Button */}
-              <TouchableOpacity onPress={onClose}>
-                <Text style={styles.closeButton}>Close</Text>
-              </TouchableOpacity>
+              <MainBtn
+                label="Close"
+                onPress={onClose}
+                style={styles.closeButton}
+              />
             </View>
           </View>
 
@@ -42,15 +56,31 @@ const ModalTemplateA = ({ isVisible, title, body, footer, photo, toolbarActions,
 
           {/* Body Section */}
           <ScrollView contentContainerStyle={styles.modalBody}>
-            {body}
+            <View style={styles.columnsContainer}>
+              {/* First Column: Passed as props */}
+              <View style={styles.column}>
+                {column1.labels.map((label, index) => (
+                  <View key={index} style={styles.labelValueRow}>
+                    <Text style={styles.label}>{label}:</Text>
+                    <Text style={styles.value}>{column1.values[index] || 'N/A'}</Text>
+                  </View>
+                ))}
+              </View>
+
+              {/* Second Column: Passed as props */}
+              <View style={styles.column}>
+                {column2.labels.map((label, index) => (
+                  <View key={index} style={styles.labelValueRow}>
+                    <Text style={styles.label}>{label}:</Text>
+                    <Text style={styles.value}>{column2.values[index] || 'N/A'}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
           </ScrollView>
 
           {/* Footer Section */}
-          {footer && (
-            <View style={styles.modalFooter}>
-              {footer}
-            </View>
-          )}
+          {footer && <View style={styles.modalFooter}>{footer}</View>}
         </View>
       </View>
     </Modal>
@@ -62,7 +92,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',  // Semi-transparent background
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
     width: '80%',
@@ -86,18 +116,13 @@ const styles = StyleSheet.create({
   },
   toolbar: {
     flexDirection: 'row',
-    marginRight: 10,  // Spacing between toolbar and close button
+    marginRight: 10,
   },
   actionButton: {
-    marginHorizontal: 5, // Spacing between action buttons
-  },
-  actionButtonText: {
-    color: 'blue',
-    fontSize: 14,
+    marginHorizontal: 5,
   },
   closeButton: {
     fontSize: 16,
-    color: 'blue',
   },
   photoContainer: {
     alignItems: 'center',
@@ -106,10 +131,30 @@ const styles = StyleSheet.create({
   photo: {
     width: 100,
     height: 100,
-    borderRadius: 50,  // Circular photo
+    borderRadius: 50,
   },
   modalBody: {
     paddingVertical: 10,
+  },
+  columnsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  column: {
+    flex: 1,
+    paddingHorizontal: 10,
+  },
+  labelValueRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  label: {
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  value: {
+    color: '#555',
   },
   modalFooter: {
     marginTop: 20,

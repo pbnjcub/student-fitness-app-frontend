@@ -61,13 +61,17 @@ const AdminListStudentView = () => {
         showArchived,
       });
       console.log('fetchedStudents:', fetchedStudents);
-      // Extract all unique graduation years from the fetched students
+      
       if (updateGradYears) {
-        const uniqueGradYears = Array.from(new Set(fetchedStudents.students.map((student) => student.studentDetails.gradYear)));
+        const uniqueGradYears = Array.from(new Set(
+          fetchedStudents.students
+            .map(student => student.studentDetails?.gradYear) // Optional chaining to avoid errors
+            .filter(gradYear => gradYear !== undefined)       // Filter out undefined values
+        ));
         const sortedUniqueGradYears = uniqueGradYears.sort((a, b) => a - b);
         setGraduationYears(sortedUniqueGradYears);
       }
-
+  
       if (fetchedStudents.errors) {
         console.error('Error fetching students:', fetchedStudents.errors);
         setStudents([]);
@@ -84,6 +88,7 @@ const AdminListStudentView = () => {
       setLoading(false);
     }
   };
+  
   
 
   useEffect(() => {
@@ -179,24 +184,45 @@ const AdminListStudentView = () => {
       {/* Modal for displaying student details */}
       <ModalTemplateA
         isVisible={isModalVisible}
-        title="Student Details"
+        title={selectedStudent ? `${selectedStudent.firstName} ${selectedStudent.lastName}` : 'Student Details'}
         photo={selectedStudent ? selectedStudent.photoUrl : null}
-        body={selectedStudent && (
-          <View>
-            <Text>Name: {selectedStudent.firstName} {selectedStudent.lastName}</Text>
-            <Text>Email: {selectedStudent.email}</Text>
-            <Text>Graduation Year: {selectedStudent.studentDetails.gradYear}</Text>
-            <Text>Gender Identity: {selectedStudent.genderIdentity}</Text>
-            <Text>Pronouns: {selectedStudent.pronouns}</Text>
-          </View>
-        )}
+        
+        // First Column: User Personal Information
+        column1={{
+          labels: [ 'Birthday', 'Graduation Year', 'Email', 'Gender Identity', 'Pronouns'],
+          values: [
+            selectedStudent?.birthDate || 'N/A',
+            selectedStudent?.studentDetails.gradYear || 'N/A',
+            selectedStudent?.email || 'N/A',
+            selectedStudent?.genderIdentity || 'N/A',
+            selectedStudent?.pronouns || 'N/A'
+          ]
+        }}
+        
+        // Second Column: Student Academic Information
+        column2={{
+          labels: ['Section Code', 'Weight', 'Height', 'Fitness Data'],
+          values: [
+            selectedStudent?.sectionCode || 'Unrostered',
+            selectedStudent?.anthroData?.weight || 'N/A',
+            selectedStudent?.anthroData?.height || 'N/A',
+            selectedStudent?.fitnessData || 'N/A'
+          ]
+        }}
+        
         toolbarActions={[
           { label: 'Edit User Data', onPress: () => console.log('Edit User Data') },
           { label: 'Update Anthro', onPress: () => console.log('Update Anthro') },
           { label: 'Update Fitness Data', onPress: () => console.log('Update Fitness Data') },
         ]}
-        onClose={() => setIsModalVisible(false)}  // Close modal
+        
+        onClose={() => setIsModalVisible(false)}
       />
+
+
+
+
+
 
       <View style={styles.pagination}>
         <MainBtn
@@ -284,6 +310,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  
 });
 
 export default AdminListStudentView;

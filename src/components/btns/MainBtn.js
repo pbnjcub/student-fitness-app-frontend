@@ -7,15 +7,15 @@ const MainBtn = ({ label, onPress, style, textColor }) => {
   return (
     <Pressable
       onPress={onPress}
-      onHoverIn={() => setIsHovered(true)}
-      onHoverOut={() => setIsHovered(false)}
+      onHoverIn={() => setIsHovered(true)}   // For web hover effect
+      onHoverOut={() => setIsHovered(false)} // For web hover effect
       style={({ pressed }) => [
         styles.button,
         {
-          backgroundColor: isHovered ? '#FFFFFF' : '#404040',
-          borderColor: isHovered ? '#404040' : '#FFFFF',
+          backgroundColor: isHovered ? '#FFFFFF' : '#404040',  // Hover effect
+          borderColor: isHovered ? '#404040' : '#FFFFFF',
         },
-        style,
+        style, // Accept any external styles
       ]}
     >
       <Text style={[styles.buttonText, { color: textColor || (isHovered ? '#404040' : '#FFFFFF') }]}>
@@ -24,8 +24,6 @@ const MainBtn = ({ label, onPress, style, textColor }) => {
     </Pressable>
   );
 };
-
-
 
 const styles = StyleSheet.create({
   button: {
@@ -37,7 +35,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonText: {
-    fontFamily: 'Arial', // You can change this to Futura if loaded
+    fontFamily: 'Arial',
     fontSize: 12,
   },
 });
