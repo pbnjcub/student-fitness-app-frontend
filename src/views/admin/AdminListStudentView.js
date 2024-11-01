@@ -131,6 +131,10 @@ const AdminListStudentView = () => {
     setSelectedStudent(student);
     setIsModalVisible(true);  // Show the modal when a card is clicked
   };
+
+  const handleSave = (updatedData) => {
+    console.log('Updated data:', updatedData);
+  };
   
 
   if (loading) {
@@ -189,13 +193,15 @@ const AdminListStudentView = () => {
         
         // First Column: User Personal Information
         column1={{
-          labels: [ 'Birthday', 'Graduation Year', 'Email', 'Gender Identity', 'Pronouns'],
+          labels: [ 'Email', 'Graduation Year', 'Birthday', 'Gender Identity', 'Pronouns', 'Archived', 'Date Archived' ],
           values: [
-            selectedStudent?.birthDate || 'N/A',
-            selectedStudent?.studentDetails.gradYear || 'N/A',
             selectedStudent?.email || 'N/A',
+            selectedStudent?.studentDetails.gradYear || 'N/A',
+            selectedStudent?.birthDate || 'N/A',
             selectedStudent?.genderIdentity || 'N/A',
-            selectedStudent?.pronouns || 'N/A'
+            selectedStudent?.pronouns || 'N/A',
+            selectedStudent?.isArchived || 'N/A',
+            selectedStudent?.dateArchived || 'N/A'
           ]
         }}
         
@@ -209,6 +215,8 @@ const AdminListStudentView = () => {
             selectedStudent?.fitnessData || 'N/A'
           ]
         }}
+
+        onSave={handleSave}
         
         toolbarActions={[
           { label: 'Edit User Data', onPress: () => console.log('Edit User Data') },
@@ -219,17 +227,12 @@ const AdminListStudentView = () => {
         onClose={() => setIsModalVisible(false)}
       />
 
-
-
-
-
-
       <View style={styles.pagination}>
         <MainBtn
           label="Previous"
           onPress={() => handlePageChange(currentPage - 1)}
-          style={[styles.pageButton, currentPage <= 1 && styles.disabledButton]}
-          textColor={currentPage <= 1 ? '#000000' : undefined}
+          style={styles.pageButton}
+          textColor="#000000"
           disabled={currentPage <= 1}
         />
 
@@ -238,23 +241,20 @@ const AdminListStudentView = () => {
             key={index}
             label={(index + 1).toString()}
             onPress={() => handlePageChange(index + 1)}
-            style={
-              currentPage === index + 1
-                ? [styles.activePageButton, styles.activePageText]
-                : styles.pageButton
-            }
-            textColor={currentPage === index + 1 ? '#000000' : undefined}
+            style={styles.pageButton}
+            isActive={currentPage === index + 1} // Apply active styling when current page
           />
         ))}
 
         <MainBtn
           label="Next"
           onPress={() => handlePageChange(currentPage + 1)}
-          style={[styles.pageButton, currentPage >= totalPages && styles.disabledButton]}
-          textColor={currentPage >= totalPages ? '#000000' : undefined}
+          style={styles.pageButton}
+          textColor="#000000"
           disabled={currentPage >= totalPages}
         />
       </View>
+
     </View>
   );
 };

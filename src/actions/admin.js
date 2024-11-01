@@ -1,5 +1,6 @@
 import { API_BASE_URL } from '@env';
 
+// Get all students from the API
 export const getAllStudents = async ({ page = 1, limit = 24, searchText = '', graduationYear = '', sectionCode = '', showArchived = false }) => {
   try {
     // Construct URLSearchParams for query parameters
@@ -47,6 +48,8 @@ export const getAllStudents = async ({ page = 1, limit = 24, searchText = '', gr
   }
 };
 
+
+// Get all section codes from the API
 export const getAllSectionCodes = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/sections/active`, {

@@ -1,26 +1,27 @@
+// MainBtn.js
 import React, { useState } from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
 
-const MainBtn = ({ label, onPress, style, textColor }) => {
+const MainBtn = ({ label, onPress, style, textColor, isActive = false }) => {
   const [isHovered, setIsHovered] = useState(false);
+
+  // Determine if button should be styled as active
+  const buttonBackgroundColor = isActive ? '#FFFFFF' : isHovered ? '#FFFFFF' : '#404040';
+  const buttonBorderColor = isActive ? '#000000' : isHovered ? '#404040' : '#FFFFFF';
+  const buttonTextColor = textColor || (isActive ? '#000000' : isHovered ? '#404040' : '#FFFFFF');
 
   return (
     <Pressable
       onPress={onPress}
-      onHoverIn={() => setIsHovered(true)}   // For web hover effect
-      onHoverOut={() => setIsHovered(false)} // For web hover effect
-      style={({ pressed }) => [
+      onHoverIn={() => setIsHovered(true)}
+      onHoverOut={() => setIsHovered(false)}
+      style={[
         styles.button,
-        {
-          backgroundColor: isHovered ? '#FFFFFF' : '#404040',  // Hover effect
-          borderColor: isHovered ? '#404040' : '#FFFFFF',
-        },
-        style, // Accept any external styles
+        { backgroundColor: buttonBackgroundColor, borderColor: buttonBorderColor },
+        style,
       ]}
     >
-      <Text style={[styles.buttonText, { color: textColor || (isHovered ? '#404040' : '#FFFFFF') }]}>
-        {label}
-      </Text>
+      <Text style={[styles.buttonText, { color: buttonTextColor }]}>{label}</Text>
     </Pressable>
   );
 };

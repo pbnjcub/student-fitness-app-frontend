@@ -1,91 +1,113 @@
-import React from 'react';
+// ModalTemplateA.js
+import React, { useState } from 'react';
 import { Modal, View, Text, StyleSheet, ScrollView, Image } from 'react-native';
-import MainBtn from '../btns/MainBtn'; // Import MainBtn component
+import MainBtn from '../btns/MainBtn';
+import ModalTemplateAUserDataView from './views/ModalTemplateAUserDataView';
+import ModalTemplateAUserDataForm from './forms/ModalTemplateAUserDataForm';
 
 const ModalTemplateA = ({
-  isVisible,
-  title,
-  column1 = { labels: [], values: [] },  // Props for the first column
-  column2 = { labels: [], values: [] },  // Props for the second column
-  footer,
-  photo,
-  toolbarActions,
-  onClose,
-  animationType = "slide",
-}) => {
-  return (
-    <Modal
-      visible={isVisible}
-      transparent={true}
-      animationType={animationType}
-      onRequestClose={onClose}
-    >
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          {/* Header Section */}
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{title}</Text>
-
-            <View style={styles.headerActions}>
-              {toolbarActions && toolbarActions.length > 0 && (
-                <View style={styles.toolbar}>
-                  {toolbarActions.map((action, index) => (
-                    <MainBtn
-                      key={index}
-                      label={action.label}
-                      onPress={action.onPress}
-                      style={styles.actionButton}
+    isVisible,
+    title,
+    column1 = { labels: [], values: [] },
+    column2 = { labels: [], values: [] },
+    onSave,
+    photo,
+    toolbarActions,
+    onClose,
+    animationType = "slide",
+  }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [activeToolbarButton, setActiveToolbarButton] = useState(null);
+  
+    const handleEdit = () => {
+      setIsEditing(true);
+      setActiveToolbarButton('Edit User Data');
+    };
+  
+    const handleSave = (updatedData) => {
+      onSave(updatedData);
+      setIsEditing(false);
+      setActiveToolbarButton(null);
+    };
+  
+    const handleCancel = () => {
+      setIsEditing(false);
+      setActiveToolbarButton(null);
+    };
+  
+    const handleClose = () => {
+      setIsEditing(false); // Reset to default view
+      setActiveToolbarButton(null);
+      onClose();
+    };
+  
+    const initialValues = column1.labels.reduce((acc, label, index) => {
+      acc[label] = column1.values[index] || '';
+      return acc;
+    }, {});
+  
+    return (
+      <Modal
+        visible={isVisible}
+        transparent={true}
+        animationType={animationType}
+        onRequestClose={handleClose}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{title}</Text>
+              <View style={styles.headerActions}>
+                {toolbarActions && toolbarActions.length > 0 && (
+                  <View style={styles.toolbar}>
+                    {toolbarActions.map((action, index) => (
+                      <MainBtn
+                        key={index}
+                        label={action.label}
+                        onPress={() => {
+                          action.onPress();
+                          if (action.label === 'Edit User Data') handleEdit();
+                        }}
+                        isActive={activeToolbarButton === action.label}
+                        style={styles.actionButton}
+                      />
+                    ))}
+                  </View>
+                )}
+                <MainBtn label="Close" onPress={handleClose} style={styles.closeButton} />
+              </View>
+            </View>
+  
+            {photo && (
+              <View style={styles.photoContainer}>
+                <Image source={{ uri: photo }} style={styles.photo} />
+              </View>
+            )}
+  
+            <ScrollView contentContainerStyle={styles.modalBody}>
+              <View style={styles.columnsContainer}>
+                <View style={styles.column}>
+                  {isEditing ? (
+                    <ModalTemplateAUserDataForm
+                      initialValues={initialValues}
+                      onSave={handleSave}
+                      onCancel={handleCancel}
                     />
-                  ))}
+                  ) : (
+                    <ModalTemplateAUserDataView labels={column1.labels} values={column1.values} />
+                  )}
                 </View>
-              )}
-              <MainBtn
-                label="Close"
-                onPress={onClose}
-                style={styles.closeButton}
-              />
-            </View>
+                <View style={styles.column}>
+                  <ModalTemplateAUserDataView labels={column2.labels} values={column2.values} />
+                </View>
+              </View>
+            </ScrollView>
           </View>
-
-          {/* Optional Photo */}
-          {photo && (
-            <View style={styles.photoContainer}>
-              <Image source={{ uri: photo }} style={styles.photo} />
-            </View>
-          )}
-
-          {/* Body Section */}
-          <ScrollView contentContainerStyle={styles.modalBody}>
-            <View style={styles.columnsContainer}>
-              {/* First Column: Passed as props */}
-              <View style={styles.column}>
-                {column1.labels.map((label, index) => (
-                  <View key={index} style={styles.labelValueRow}>
-                    <Text style={styles.label}>{label}:</Text>
-                    <Text style={styles.value}>{column1.values[index] || 'N/A'}</Text>
-                  </View>
-                ))}
-              </View>
-
-              {/* Second Column: Passed as props */}
-              <View style={styles.column}>
-                {column2.labels.map((label, index) => (
-                  <View key={index} style={styles.labelValueRow}>
-                    <Text style={styles.label}>{label}:</Text>
-                    <Text style={styles.value}>{column2.values[index] || 'N/A'}</Text>
-                  </View>
-                ))}
-              </View>
-            </View>
-          </ScrollView>
-
-          {/* Footer Section */}
-          {footer && <View style={styles.modalFooter}>{footer}</View>}
         </View>
-      </View>
-    </Modal>
-  );
-};
+      </Modal>
+    );
+  };
+  
 
 const styles = StyleSheet.create({
   modalContainer: {
@@ -143,22 +165,6 @@ const styles = StyleSheet.create({
   column: {
     flex: 1,
     paddingHorizontal: 10,
-  },
-  labelValueRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  label: {
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  value: {
-    color: '#555',
-  },
-  modalFooter: {
-    marginTop: 20,
-    alignItems: 'flex-end',
   },
 });
 
